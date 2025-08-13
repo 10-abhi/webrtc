@@ -15,11 +15,14 @@ export const Sender = ()=>{
         if(!socket)return;
         const pc = new RTCPeerConnection();
         const offer = await pc.createOffer();
-        pc.setLocalDescription(offer);
+        await pc.setLocalDescription(offer);
         socket.send(JSON.stringify({type : "create-offer" , sdp : offer}));
-        socket.onmessage = (event)=>{
+        socket.onmessage = async(event)=>{
             const message = JSON.parse(event.data);
-            pc.setRemoteDescription(message.sdp);
+          if(message.type === "create-answer")
+           await pc.setRemoteDescription(message.sdp);
+          else if(message.type == "iceCandidate")
+            await pc.addIceCandidate(message.candidate);
         }
     }
     return <div>
