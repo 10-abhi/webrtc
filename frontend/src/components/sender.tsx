@@ -11,7 +11,7 @@ export const Sender = ()=>{
       }
     } , []);
 
-    async function startSendingVideo(){
+    const startSendingVideo = async()=>{
         if(!socket)return;
         const pc = new RTCPeerConnection();
 
@@ -36,8 +36,20 @@ export const Sender = ()=>{
           else if(message.type == "iceCandidate")
             await pc.addIceCandidate(message.candidate);
         }
-        const stream = await navigator.mediaDevices.getUserMedia({video : true , audio : false});
-        pc.addTrack(stream.getVideoTracks()[0]);
+        
+        const getCameraStreamAndSend = (pc : RTCPeerConnection)=>{
+          navigator.mediaDevices.getUserMedia({video:true}).then((stream)=>{
+            const video = document.createElement('video');
+            video.srcObject = stream;
+            video.play();
+            //this should be propagated via a component but anyways
+            document.body.appendChild(video);
+            stream.getTracks().forEach((track)=>{
+              pc?.addTrack(track);
+            });
+          });
+        }
+      getCameraStreamAndSend(pc);
 
     }
     return <div>

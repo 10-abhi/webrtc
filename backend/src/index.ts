@@ -27,8 +27,10 @@ wss.on('connection' , function connection(ws){
             senderSocket?.send(JSON.stringify({type : "create-answer" , sdp : message.sdp}));
         }else if(message.type === 'icecandidate'){
             if(ws === senderSocket){
+                console.log("inside icecand i.e sending to receiver")
                 receiverSocket?.send(JSON.stringify({type:"iceCandidate" , candidate : message.candidate}));
             }else if(ws == receiverSocket){
+                console.log("inside icecand i.e sending to sender")
                 senderSocket?.send(JSON.stringify({type:"iceCandidate", candidate : message.candidate}))
             }
         }
